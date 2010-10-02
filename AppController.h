@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface AppController : NSObject <NSApplicationDelegate> {
+@interface AppController : NSObject {
     NSWindow *window;
     NSString *ipDNS;
     NSString *ipCurrent;
