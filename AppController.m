@@ -119,7 +119,7 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 - (void)threadDone {
     DLog(@"");
     [self setAnimate:NO];
-    if ( [ipDNS isEqual:@"f"]) {
+    if ([ipDNS isEqual:ipCurrent]) {
         [self setIcon:[self createIconWithColor:[NSColor greenColor]]];
     } else {
         [self setIcon:[self createIconWithColor:[NSColor redColor]]];
