@@ -7,17 +7,25 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "AppController.h"
+#import "PortChecker.h"
 
 @interface AppController : NSObject {
     NSWindow *window;
     NSString *ipDNS;
     NSString *ipCurrent;
+    PortChecker *sshPort;
+    BOOL    animate;
+    NSImage *icon;
     
 }
 
 @property (assign) IBOutlet NSWindow *window;
 @property (copy)   NSString *ipDNS;
 @property (copy)   NSString *ipCurrent;
+@property (assign) BOOL animate;
+@property (retain) NSImage *icon;
 
 - (IBAction)run:(id)sender;
+- (IBAction)doPortCheck:(id)sender;
 @end

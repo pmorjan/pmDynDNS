@@ -12,12 +12,12 @@
 @interface PortChecker : NSObject {
     NSNumber *port;
     NSString *hostname;
-    NSString *result;
+    NSNumber * status;
 }
 
-@property (copy) NSString *result;
 @property (copy) NSString *hostname;
 @property (retain) NSNumber *port;
+@property (retain) NSNumber *status;
 
-- (IBAction)checkPort:(id)sender;
+- (void)checkStatus;
 @end
