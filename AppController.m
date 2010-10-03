@@ -15,7 +15,6 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 
 @interface AppController (Private)
 - (NSImage *)createIconWithColor:(NSColor *)color;
-- (void)portCheckerThreadDone;
 @end
 
 
@@ -34,10 +33,7 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
         ipCurrent   = @"0.0.0.0";
         animate     = NO;
         [NSHost setHostCacheEnabled:NO];
-        sshPort             = [[PortChecker alloc]init];
-        sshPort.hostname    = @"ber0tec.dyndns.org";
-        sshPort.port        = [NSNumber numberWithInt:51967];
-        icon                = [[self createIconWithColor:[NSColor yellowColor]]retain];
+        icon        = nil;
     }
     return self;
 }
@@ -66,25 +62,30 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 	return YES;
 }
 
-- (IBAction)run:(id)sender 
-{
+
+- (IBAction)doIPCheck:(id)sender {
+    DLog(@"");
+    [self setAnimate:YES];
+    [self setIcon:nil];
+    [self setIpDNS:@"0.0.0.0"];
+    [self setIpCurrent:@"0.0.0.0"];
+    [NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];
+}
+
+- (void)startThread {
+    DLog(@"");    
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    
     [self setIpDNS:[[NSHost hostWithName:hostname]address]];
     
     NSError *error;
     NSURLResponse *response;
-
-    
-
     NSURL *url = [NSURL URLWithString:urlCheckIP];
-    
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url
                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                             timeoutInterval:5];
-                                            
+    
     NSData *urlData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
-    
-    
-    
     if (!urlData) {
         [[NSAlert alertWithError:error]runModal];
         return;
@@ -96,47 +97,29 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
         return;
     }
     
-    NSLog(@"%@", xmlDoc);
     // <html><head><title>Current IP Check</title></head><body>Current IP Address: 85.180.120.19</body></html>
-
     NSArray *a = [[xmlDoc nodesForXPath:@"html/body" error:&error]retain];
     if (!a) {
         [[NSAlert alertWithError:error]runModal];
         return;
     }
 
+    // <body>Current IP Address: 85.180.120.19</body>    
     NSString * s = [NSString stringWithString:[[a objectAtIndex:0]stringValue]];
-    // <body>Current IP Address: 85.180.120.19</body>
     NSRange r =  { 20 , [s length]-20};
     NSLog(@"%@", s);
     
     [self setIpCurrent:[s substringWithRange:r]];
-    
-}
-
-- (IBAction)doPortCheck:(id)sender {
-    DLog(@"");
-    [self setAnimate:YES];
-    [self setIcon:[self createIconWithColor:[NSColor yellowColor]]];
-	[sshPort checkStatus];
-    [self portCheckerThreadDone];
-    return;
-    [NSThread detachNewThreadSelector:@selector(startPortCheckerThread) toTarget:self withObject:nil];
-}
-
-- (void)startPortCheckerThread {
-    DLog(@"");    
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-	[sshPort checkStatus];
-	[self performSelectorOnMainThread:@selector(portCheckerThreadDone) withObject:nil waitUntilDone:NO];
+    	
+    [self performSelectorOnMainThread:@selector(threadDone) withObject:nil waitUntilDone:NO];
 	[pool release];
     
 }
 
-- (void)portCheckerThreadDone {
+- (void)threadDone {
     DLog(@"");
     [self setAnimate:NO];
-    if ([[sshPort status]intValue] == 1) {
+    if ( [ipDNS isEqual:@"f"]) {
         [self setIcon:[self createIconWithColor:[NSColor greenColor]]];
     } else {
         [self setIcon:[self createIconWithColor:[NSColor redColor]]];
