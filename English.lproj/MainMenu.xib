@@ -1514,6 +1514,7 @@
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1920, 1178}}</string>
 				<string key="NSMaxSize">{1.79769e+308, 1.79769e+308}</string>
+				<string key="NSFrameAutosaveName">Preferences</string>
 			</object>
 			<object class="NSCustomObject" id="976324537">
 				<string key="NSClassName">AppController</string>
