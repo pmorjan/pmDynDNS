@@ -12,6 +12,7 @@ static NSString *hostname   = @"ber0tec.dyndns.org";
 static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 
 // http://www.myip.ch/      <html><head><title>Current IP Check</title></head><body>Current IP Address: 85.180.119.30</body></html>
+// http://whatismyip.org/   1.2.3.4  (no eol)
 
 @interface AppController (Private)
 - (NSImage *)createIconWithColor:(NSColor *)color;
