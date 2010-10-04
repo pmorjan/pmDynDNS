@@ -40,7 +40,7 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 
 - (NSImage *)createIconWithColor:(NSColor *)color
 {
-    NSSize imgSize = NSMakeSize(20, 20);
+    NSSize imgSize = NSMakeSize(16, 16);
 
     NSImage *image = [[NSImage alloc] initWithSize:imgSize];
     [image lockFocus];
