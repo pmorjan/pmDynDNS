@@ -63,6 +63,11 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 	return YES;
 }
 
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults synchronize];    
+}
 
 - (IBAction)doIPCheck:(id)sender {
     DLog(@"");
