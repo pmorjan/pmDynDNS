@@ -55,7 +55,8 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-	// Insert code here to initialize your application 
+	// Insert code here to initialize your application
+    [self doIPCheck:nil];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication
