@@ -8,8 +8,7 @@
 
 #import "AppController.h"
 
-static NSString *hostname   = @"ber0tec.dyndns.org";
-static NSString *urlCheckIP = @"http://checkip.dyndns.org";
+
 
 // http://www.myip.ch/      <html><head><title>Current IP Check</title></head><body>Current IP Address: 85.180.119.30</body></html>
 // http://whatismyip.org/   1.2.3.4  (no eol)
@@ -21,15 +20,21 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 
 @implementation AppController
 
+
 @synthesize window;
 @synthesize ipDNS, ipCurrent;
 @synthesize animate;
 @synthesize icon;
+@synthesize hostname;
+@synthesize urlCheckIP;
+
 
 - (id) init
 {
     self = [super init];
     if (self != nil) {
+        hostname    = @"ber0tec.dyndns.org";
+        urlCheckIP  = @"http://checkip.dyndns.org";
         ipDNS       = @"0.0.0.0";
         ipCurrent   = @"0.0.0.0";
         animate     = NO;
@@ -56,7 +61,7 @@ static NSString *urlCheckIP = @"http://checkip.dyndns.org";
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
 	// Insert code here to initialize your application
-    [self doIPCheck:nil];
+    //[self doIPCheck:nil];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication

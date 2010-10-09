@@ -10,19 +10,22 @@
 #import "AppController.h"
 
 @interface AppController : NSObject {
-    NSWindow *window;
-    NSString *ipDNS;
-    NSString *ipCurrent;
-    BOOL    animate;
-    NSImage *icon;
-    
+    NSWindow    *window;
+    NSString    *ipDNS;
+    NSString    *ipCurrent;
+    BOOL        animate;
+    NSImage     *icon;
+    NSString    *hostname;
+    NSString    *urlCheckIP;
 }
 
-@property (assign) IBOutlet NSWindow *window;
-@property (copy)   NSString *ipDNS;
-@property (copy)   NSString *ipCurrent;
-@property (assign) BOOL animate;
-@property (retain) NSImage *icon;
+@property (assign)  IBOutlet NSWindow *window;
+@property (copy)    NSString *ipDNS;
+@property (copy)    NSString *ipCurrent;
+@property (assign)  BOOL animate;
+@property (retain)  NSImage *icon;
+@property (readonly)    NSString *hostname;
+@property (readonly)    NSString *urlCheckIP;
 
 - (IBAction)doIPCheck:(id)sender;
 @end
