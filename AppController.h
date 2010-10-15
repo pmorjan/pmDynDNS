@@ -17,6 +17,7 @@
     NSImage     *icon;
     NSString    *hostname;
     NSString    *urlCheckIP;
+    NSString    *errorMsg;
 }
 
 @property (assign)  IBOutlet NSWindow *window;
@@ -26,6 +27,6 @@
 @property (retain)  NSImage *icon;
 @property (readonly)    NSString *hostname;
 @property (readonly)    NSString *urlCheckIP;
-
+@property (copy)    NSString *errorMsg;
 - (IBAction)doIPCheck:(id)sender;
 @end
