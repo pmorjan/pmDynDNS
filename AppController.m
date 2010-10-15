@@ -15,6 +15,7 @@
 
 @interface AppController (Private)
 - (NSImage *)createIconWithColor:(NSColor *)color;
+
 @end
 
 
@@ -27,6 +28,7 @@
 @synthesize icon;
 @synthesize hostname;
 @synthesize urlCheckIP;
+@synthesize errorMsg;
 
 
 - (id) init
@@ -37,6 +39,7 @@
         urlCheckIP  = @"http://checkip.dyndns.org";
         ipDNS       = @"0.0.0.0";
         ipCurrent   = @"0.0.0.0";
+        errorMsg    = @"";
         animate     = NO;
         [NSHost setHostCacheEnabled:NO];
         icon        = nil;
@@ -81,6 +84,7 @@
     [self setIcon:nil];
     [self setIpDNS:@"0.0.0.0"];
     [self setIpCurrent:@"0.0.0.0"];
+    [self setErrorMsg:@""];
     [NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];
 }
 
@@ -99,33 +103,32 @@
     
     NSData *urlData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
     if (!urlData) {
-        [[NSAlert alertWithError:error]runModal];
-        return;
-    }
+        [self setErrorMsg:[error localizedDescription]];
+
+    } else {
     
-    NSXMLDocument *xmlDoc = [[NSXMLDocument alloc]initWithData:urlData options:0 error:&error];
-    if (!xmlDoc) {
-        [[NSAlert alertWithError:error]runModal];
-        return;
-    }
-    
-    // <html><head><title>Current IP Check</title></head><body>Current IP Address: 85.180.120.19</body></html>
-    NSArray *a = [[xmlDoc nodesForXPath:@"html/body" error:&error]retain];
-    if (!a) {
-        [[NSAlert alertWithError:error]runModal];
-        return;
+        NSXMLDocument *xmlDoc = [[NSXMLDocument alloc]initWithData:urlData options:0 error:&error];
+        if (!xmlDoc) {
+            [self setErrorMsg:[error localizedDescription]];
+        } else {    
+            // <html><head><title>Current IP Check</title></head><body>Current IP Address: 85.180.120.19</body></html>
+            NSArray *a = [[xmlDoc nodesForXPath:@"html/body" error:&error]retain];
+            if (!a || [a count] < 1) {
+                [self setErrorMsg:@"can't get current IP"];        
+            } else {
+                // <body>Current IP Address: 85.180.120.19</body>    
+                NSString * s = [NSString stringWithString:[[a objectAtIndex:0]stringValue]];
+                NSRange r =  { 20 , [s length]-20};
+                NSLog(@"%@", s);
+                [self setIpCurrent:[s substringWithRange:r]];
+                [self setErrorMsg:@""];
+            }
+        }
     }
 
-    // <body>Current IP Address: 85.180.120.19</body>    
-    NSString * s = [NSString stringWithString:[[a objectAtIndex:0]stringValue]];
-    NSRange r =  { 20 , [s length]-20};
-    NSLog(@"%@", s);
-    
-    [self setIpCurrent:[s substringWithRange:r]];
-    	
     [self performSelectorOnMainThread:@selector(threadDone) withObject:nil waitUntilDone:NO];
 	[pool release];
-    
+
 }
 
 - (void)threadDone {
