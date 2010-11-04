@@ -92,6 +92,7 @@
     DLog(@"");    
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
+    [NSHost flushHostCache];
     [self setIpDNS:[[NSHost hostWithName:hostname]address]];
     
     NSError *error;
@@ -99,7 +100,7 @@
     NSURL *url = [NSURL URLWithString:urlCheckIP];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url
                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
-                                            timeoutInterval:5];
+                                            timeoutInterval:20];
     
     NSData *urlData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
     if (!urlData) {
@@ -139,7 +140,6 @@
     } else {
         [self setIcon:[self createIconWithColor:[NSColor redColor]]];
     }
-
 }
 
 
