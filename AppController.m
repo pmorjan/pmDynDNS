@@ -35,7 +35,7 @@
 {
     self = [super init];
     if (self != nil) {
-        hostname    = @"ber0tec.dyndns.org";
+        preferences = [[Preferences alloc]init];
         urlCheckIP  = @"http://checkip.dyndns.org";
         ipDNS       = @"0.0.0.0";
         ipCurrent   = @"0.0.0.0";
@@ -74,8 +74,16 @@
 
 - (void)applicationWillTerminate:(NSNotification *)notification
 {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    [defaults synchronize];    
+    [preferences setHostname:hostname];
+}
+
+- (void)awakeFromNib {
+    NSString *p_hostname = [preferences hostname];
+    if (p_hostname == nil) {
+            p_hostname = @"myname.dyndns.org";
+    }
+    [self setValue:p_hostname forKey:@"hostname"];
+    
 }
 
 - (IBAction)doIPCheck:(id)sender {

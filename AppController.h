@@ -8,8 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 #import "AppController.h"
+#import "Preferences.h"
 
 @interface AppController : NSObject {
+    Preferences *preferences;
     NSWindow    *window;
     NSString    *ipDNS;
     NSString    *ipCurrent;
@@ -18,6 +20,7 @@
     NSString    *hostname;
     NSString    *urlCheckIP;
     NSString    *errorMsg;
+    NSTextField *textFieldHostname;
 }
 
 @property (assign)  IBOutlet NSWindow *window;
