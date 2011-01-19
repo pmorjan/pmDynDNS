@@ -1,5 +1,6 @@
+//
 // Preferences.h
-//  pmEvent
+// pmDynDNS
 //
 
 #import <Cocoa/Cocoa.h>

@@ -1,5 +1,6 @@
+//
 // Preferences.m
-//  pmEvent
+// pmDynDNS
 //
 
 #import "Preferences.h"
