@@ -4,10 +4,13 @@
 //
 
 #import "AppController.h"
+#import <dispatch/dispatch.h>
 
 @interface AppController (Private)
 - (NSImage *)createIconWithColor:(NSColor *)color;
-
+- (void) URLloockup;
+- (void) DNSlookup;
+- (void) allThreadsDone;
 @end
 
 
@@ -15,12 +18,9 @@
 
 @synthesize window;
 @synthesize ipDNS, ipCurrent;
-@synthesize animate;
 @synthesize icon;
 @synthesize hostname;
 @synthesize urlCheckIP;
-@synthesize errorMsg;
-
 
 - (id) init
 {
@@ -30,10 +30,8 @@
         urlCheckIP  = @"http://checkip.dyndns.org";
         ipDNS       = @"0.0.0.0";
         ipCurrent   = @"0.0.0.0";
-        errorMsg    = @"";
-        animate     = NO;
-        [NSHost setHostCacheEnabled:NO];
         icon        = nil;
+        [NSHost setHostCacheEnabled:NO];
     }
     return self;
 }
@@ -77,67 +75,80 @@
 
 - (IBAction)checkDNS:(id)sender {
     DLog(@"");
-    [self setAnimate:YES];
     [self setIcon:nil];
     [self setIpDNS:@"0.0.0.0"];
     [self setIpCurrent:@"0.0.0.0 "];
-    [self setErrorMsg:@""];
     [button setEnabled:NO];
-    [NSThread detachNewThreadSelector:@selector(startThread) toTarget:self withObject:nil];
+    [progress startAnimation:self];    
+    // create group to track blocks
+    dispatch_group_t group = dispatch_group_create();
+    // get global concurrent queue
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+    // dispatch block to queue, assign block to group
+    dispatch_group_async(group, queue, ^{
+        [self DNSlookup];
+    });
+    dispatch_group_async(group, queue, ^{    
+        [self URLloockup];
+    });
+    dispatch_group_notify(group, dispatch_get_main_queue(), ^{
+        [self allThreadsDone];
+    });
 }
 
-- (void)startThread {
-    DLog(@"");    
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
+- (void)DNSlookup {
+    DLog();
     [NSHost flushHostCache];
     NSHost *host = [NSHost hostWithName:hostname];
-    if (host) {
-        [self setIpDNS:[host address]];
-    } else {
-        [self setIpDNS:@"IP not found"];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setIpDNS:host ? [host address] : @"can't get IP"];
+    });
+}
 
+- (void)URLloockup {
+    DLog();
+    NSString *str = @"unknown";
     NSError *error;
     NSURLResponse *response;
     NSURL *url = [NSURL URLWithString:urlCheckIP];
     NSURLRequest *urlRequest = [NSURLRequest requestWithURL:url
                                                 cachePolicy:NSURLRequestReloadIgnoringLocalAndRemoteCacheData 
                                             timeoutInterval:20];
-    
+        
     NSData *urlData = [NSURLConnection sendSynchronousRequest:urlRequest returningResponse:&response error:&error];
     if (!urlData) {
-        [self setErrorMsg:[error localizedDescription]];
-
+        NSAlert *alert = [NSAlert alertWithError:error];
+        [alert runModal];
     } else {
     
         NSXMLDocument *xmlDoc = [[NSXMLDocument alloc]initWithData:urlData options:0 error:&error];
         if (!xmlDoc) {
-            [self setErrorMsg:[error localizedDescription]];
+            NSAlert *alert = [NSAlert alertWithError:error];
+            [alert runModal];
         } else {    
             // <html><head><title>Current IP Check</title></head><body>Current IP Address: 21.120.121.19</body></html>
             NSArray *a = [[xmlDoc nodesForXPath:@"html/body" error:&error]retain];
             if (!a || [a count] < 1) {
-                [self setErrorMsg:@"can't get current IP"];        
+                str = @"parse error";
             } else {
                 // <body>Current IP Address: 21.120.121.19</body>    
                 NSString * s = [NSString stringWithString:[[a objectAtIndex:0]stringValue]];
                 NSRange r =  { 20 , [s length]-20 };
-                NSLog(@"%@", s);
-                [self setIpCurrent:[s substringWithRange:r]];
-                [self setErrorMsg:@""];
+                str = [s substringWithRange:r];
             }
         }
     }
-    [self performSelectorOnMainThread:@selector(threadDone) withObject:nil waitUntilDone:NO];
-	[pool release];
-
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self setIpCurrent:str];
+    });
 }
 
-- (void)threadDone {
+- (void)allThreadsDone {
     DLog(@"");
-    [self setAnimate:NO];
+    [progress stopAnimation:self];
     [button setEnabled:YES];
+
     if ([ipDNS isEqual:ipCurrent]) {
         [self setIcon:[self createIconWithColor:[NSColor greenColor]]];
     } else {
