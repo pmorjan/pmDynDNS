@@ -10,6 +10,6 @@
 {
 }
 
-@property (retain) NSString *hostname;
+@property (copy) NSString *hostname;
 
 @end
