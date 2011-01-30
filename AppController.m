@@ -7,6 +7,7 @@
 #import <dispatch/dispatch.h>
 
 static NSString *const urlCheckIP = @"http://checkip.dyndns.org";
+static NSUserDefaults *defaults = nil;
 
 @interface AppController (Private)
 - (NSImage *)createIconWithColor:(NSColor *)color;
@@ -22,17 +23,48 @@ static NSString *const urlCheckIP = @"http://checkip.dyndns.org";
 @synthesize icon;
 @synthesize hostname;
 
++ (void) initialize {
+    if (self == [AppController class]) {
+        DLog();
+        defaults = [NSUserDefaults standardUserDefaults];
+        NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"myname.dyndns.org" forKey:@"hostname"];
+        [defaults registerDefaults:appDefaults];
+    }
+}
+
 - (id)init
 {
+    DLog();
     self = [super init];
     if (self != nil) {
-        preferences = [[Preferences alloc]init];
         ipDNS       = @"0.0.0.0";
         ipCurrent   = @"0.0.0.0";
         icon        = nil;
         [NSHost setHostCacheEnabled:NO];
     }
     return self;
+}
+
+- (void)awakeFromNib 
+{
+    self.hostname = [defaults valueForKey:@"hostname"];
+    [urlLabel setStringValue:urlCheckIP];
+}
+                            
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification 
+{
+    //[self doIPCheck:nil];
+}
+
+- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication
+{
+	return YES;
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    [defaults setObject:self.hostname forKey:@"hostname"];
+    [defaults synchronize];
 }
 
 - (NSImage *)createIconWithColor:(NSColor *)color
@@ -48,31 +80,6 @@ static NSString *const urlCheckIP = @"http://checkip.dyndns.org";
     [image unlockFocus];
     [image autorelease];
     return image;
-}
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification 
-{
-    //[self doIPCheck:nil];
-}
-
-- (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication
-{
-	return YES;
-}
-
-- (void)applicationWillTerminate:(NSNotification *)notification
-{
-    [preferences setHostname:hostname];
-}
-
-- (void)awakeFromNib 
-{
-    NSString *p_hostname = [preferences hostname];
-    if (p_hostname == nil) {
-        p_hostname = @"myname.dyndns.org";
-    }
-    [self setValue:p_hostname forKey:@"hostname"];
-    [urlLabel setStringValue:urlCheckIP];
 }
 
 - (IBAction)checkDNS:(id)sender 
@@ -166,8 +173,6 @@ static NSString *const urlCheckIP = @"http://checkip.dyndns.org";
 
 - (void)dealloc 
 {
-    preferences = nil;
-    [preferences release];
     [super dealloc];
 }
 @end

@@ -5,10 +5,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import "AppController.h"
-#import "Preferences.h"
 
 @interface AppController : NSObject {
-    Preferences     *preferences;
     NSString        *ipDNS;
     NSString        *ipCurrent;
     NSImage         *icon;
@@ -21,6 +19,6 @@
 @property (copy)        NSString *ipDNS;
 @property (copy)        NSString *ipCurrent;
 @property (retain)      NSImage  *icon;
-@property (readonly)    NSString *hostname;
+@property (copy)    NSString *hostname;
 - (IBAction)checkDNS:(id)sender;
 @end
