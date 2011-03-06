@@ -22,6 +22,7 @@ static NSUserDefaults *defaults = nil;
 @synthesize ipDNS, ipCurrent;
 @synthesize icon;
 @synthesize hostname;
+@synthesize window;
 
 + (void) initialize {
     if (self == [AppController class]) {
