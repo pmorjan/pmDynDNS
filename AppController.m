@@ -7,6 +7,7 @@
 #import <dispatch/dispatch.h>
 
 static NSString *const urlCheckIP = @"http://checkip.dyndns.org";
+static NSString *const domain  = @".dyndns.org";
 static NSUserDefaults *defaults = nil;
 
 @interface AppController (Private)
@@ -28,7 +29,7 @@ static NSUserDefaults *defaults = nil;
     if (self == [AppController class]) {
         DLog();
         defaults = [NSUserDefaults standardUserDefaults];
-        NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"myname.dyndns.org" forKey:@"hostname"];
+        NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"foobar" forKey:@"hostname"];
         [defaults registerDefaults:appDefaults];
     }
 }
@@ -112,7 +113,7 @@ static NSUserDefaults *defaults = nil;
 {
     DLog();
     [NSHost flushHostCache];
-    NSHost *host = [NSHost hostWithName:hostname];
+    NSHost *host = [NSHost hostWithName:[hostname stringByAppendingString:domain]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setIpDNS:host ? [host address] : @"can't get IP"];
     });
