@@ -113,6 +113,8 @@ static NSUserDefaults *defaults = nil;
 {
     DLog();
     [NSHost flushHostCache];
+    self.hostname = [self.hostname stringByTrimmingCharactersInSet:
+                               [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSHost *host = [NSHost hostWithName:[hostname stringByAppendingString:domain]];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self setIpDNS:host ? [host address] : @"can't get IP"];
