@@ -116,15 +116,13 @@ static NSUserDefaults *defaults = nil;
     self.hostname = [self.hostname stringByTrimmingCharactersInSet:
                                [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSHost *host = [NSHost hostWithName:[hostname stringByAppendingString:domain]];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self setIpDNS:host ? [host address] : @"can't get IP"];
-    });
+    [self setIpDNS:[host address] ? [host address] : @"failed"];
 }
 
 - (void)URLloockup 
 {
     DLog();
-    NSString *str = @"unknown";
+    NSString *str = @"not found";
     NSError *error;
     NSURLResponse *response;
     NSURL *url = [NSURL URLWithString:urlCheckIP];
@@ -157,9 +155,7 @@ static NSUserDefaults *defaults = nil;
         [xmlDoc release];
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self setIpCurrent:str];
-    });
+    [self setIpCurrent:str];
 }
 
 - (void)allThreadsDone 
@@ -175,8 +171,5 @@ static NSUserDefaults *defaults = nil;
     }
 }
 
-- (void)dealloc 
-{
-    [super dealloc];
-}
+
 @end
