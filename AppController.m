@@ -42,7 +42,6 @@ static NSUserDefaults *defaults = nil;
         ipDNS       = @"0.0.0.0";
         ipCurrent   = @"0.0.0.0";
         icon        = nil;
-        [NSHost setHostCacheEnabled:NO];
     }
     return self;
 }
@@ -55,7 +54,7 @@ static NSUserDefaults *defaults = nil;
                             
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification 
 {
-    //[self doIPCheck:nil];
+    [self checkDNS:nil];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)theApplication
@@ -91,7 +90,7 @@ static NSUserDefaults *defaults = nil;
     [self setIpDNS:@"0.0.0.0"];
     [self setIpCurrent:@"0.0.0.0 "];
     [button setEnabled:NO];
-    [progress startAnimation:self];    
+    [progress startAnimation:self];
     // create group to track blocks
     dispatch_group_t group = dispatch_group_create();
     // get global concurrent queue
@@ -112,7 +111,6 @@ static NSUserDefaults *defaults = nil;
 - (void)DNSlookup 
 {
     DLog();
-    [NSHost flushHostCache];
     self.hostname = [self.hostname stringByTrimmingCharactersInSet:
                                [NSCharacterSet whitespaceAndNewlineCharacterSet]];
     NSHost *host = [NSHost hostWithName:[hostname stringByAppendingString:domain]];
